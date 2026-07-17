@@ -1,0 +1,116 @@
+local Players=game:   
+                                                                        GetService("Players");local UserInputService=   
+                                                                    game:GetService("UserInputService");local RunService=game:    
+                                                                GetService("RunService");local Workspace=game:GetService("Workspace");  
+                                                            local player=Players.LocalPlayer;local camera=Workspace.CurrentCamera;local   
+                                                          Settings={Enabled=false,Aimbot=false,SilentAim=false,AutoReaction=false,          
+                                                        ShowVisuals=true,ExpandHitbox=false,ESP=true,AntiTeam=true,WallCheck=true,            
+                                                      BulletTeleport=true,AimSpeed=0.45,FOV=110,HitboxSize=8,SilentStrength=0.94};local         
+                                                    currentTarget=nil;local visuals={esp={},silentCircle=nil,currentHitbox=nil};local dragging=   
+                                                  false;local isMinimized=false;local isCollapsed=false;local screenGui=Instance.new("ScreenGui");  
+                                                  screenGui.Name="BiohazardAI";screenGui.ResetOnSpawn=false;screenGui.Parent=player:WaitForChild(     
+                                                "PlayerGui");local mainFrame=Instance.new("Frame");mainFrame.Size=UDim2.new(0,320,0,520);mainFrame.     
+                                                Position=UDim2.new(0.5, -160,0.5, -260);mainFrame.BackgroundColor3=Color3.fromRGB(8,12,8);mainFrame.      
+                                              BackgroundTransparency=0.08;mainFrame.Parent=screenGui;Instance.new("UICorner",mainFrame).CornerRadius=UDim.  
+                                              new(0,14);local titleBar=Instance.new("Frame");titleBar.Size=UDim2.new(1,0,0,40);titleBar.BackgroundColor3=   
+                                            Color3.fromRGB(12,18,12);titleBar.BackgroundTransparency=0.1;titleBar.Parent=mainFrame;Instance.new("UICorner",   
+                                            titleBar).CornerRadius=UDim.new(0,14);local title=Instance.new("TextLabel");title.Size=UDim2.new(1, -110,1,0);title 
+                                          .BackgroundTransparency=1;title.Text="☣ Biohazard AI";title.TextColor3=Color3.fromRGB(80,255,120);title.TextScaled=true 
+                                          ;title.Font=Enum.Font.GothamBold;title.Parent=titleBar;local collapseBtn=Instance.new("TextButton");collapseBtn.Size=     
+                                          UDim2.new(0,32,0,32);collapseBtn.Position=UDim2.new(1, -80,0,4);collapseBtn.BackgroundTransparency=1;collapseBtn.Text="⤢";  
+                                          collapseBtn.TextColor3=Color3.fromRGB(80,255,120);collapseBtn.TextScaled=true;collapseBtn.Parent=titleBar;local minimizeBtn 
+                                        =Instance.new("TextButton");minimizeBtn.Size=UDim2.new(0,32,0,32);minimizeBtn.Position=UDim2.new(1, -42,0,4);minimizeBtn.       
+                                        BackgroundTransparency=1;minimizeBtn.Text="▼";minimizeBtn.TextColor3= --[[==============================]]Color3.fromRGB(80,255,  
+                                        120);minimizeBtn.TextScaled=true;minimizeBtn.Parent=        --[[============================================]]titleBar;local      
+                                        content=Instance.new("ScrollingFrame");content.Size=    --[[======================================================]]UDim2.new(1, -  
+                                      16,1, -50);content.Position=UDim2.new(0,8,0,45);      --[[==========================================================]]content.          
+                                      BackgroundTransparency=1;content.ScrollBarThickness --[[==============================================================]]=4;content.     
+                                      ScrollBarImageColor3=Color3.fromRGB(40,80,40);      --[[================================================================]]content.Parent= 
+                                      mainFrame;local miniIcon=Instance.new("TextButton") --[[==================================================================]];miniIcon.    
+                                      Size=UDim2.new(0,0,0,0);miniIcon.Position=UDim2.new --[[==================================================================]](0.02,0,0.85,0)   
+                                    ;miniIcon.BackgroundColor3=Color3.fromRGB(12,18,12);  --[[====================================================================]]miniIcon.Text 
+                    ="☣";miniIcon.TextColor3=Color3.fromRGB(80,255,120);miniIcon.Font=    --[[====================================================================]]Enum.Font.      
+              GothamBold;miniIcon.TextSize=28;miniIcon.Visible=false;miniIcon.Parent=     --[[======================================================================]]screenGui;    
+            Instance.new("UICorner",miniIcon).CornerRadius=UDim.new(1,0);titleBar.        --[[======================================================================]]InputBegan:   
+          Connect(function(i) if ((i.UserInputType==Enum.UserInputType.MouseButton1) or ( --[[======================================================================]]i.            
+        UserInputType==Enum.UserInputType.Touch)) then dragging=true;dragStart=i.Position --[[======================================================================]]-mainFrame.   
+        AbsolutePosition ;end end);UserInputService.InputChanged:Connect(function(i) if ( --[[======================================================================]]dragging and  
+      ((i.UserInputType==Enum.UserInputType.MouseMovement) or (i.UserInputType==Enum.     --[[======================================================================]]UserInputType 
+      .Touch))) then mainFrame.Position=UDim2.new(0,i.Position.X-dragStart.X ,0,i.Position. --[[==================================================================]]Y-dragStart.Y ) 
+      ;end end);UserInputService.InputEnded:Connect(function() dragging=false;end);local    --[[================================================================]]TweenService=game 
+    :GetService("TweenService");local function CollapseToIcon() isCollapsed=true;mainFrame. --[[==============================================================]]Visible=false;    
+    miniIcon.Visible=true;miniIcon.Size=UDim2.new(0,0,0,0);miniIcon.Position=UDim2.new(0.02,0 --[[==========================================================]],0.85,0);           
+    TweenService:Create(miniIcon,TweenInfo.new(0.3),{Size=UDim2.new(0,50,0,50),Position=UDim2.  --[[====================================================]]new(0.02,0,0.85,0)}):   
+    Play();end local function ExpandFromIcon() isCollapsed=false;miniIcon.Visible=false;mainFrame --[[==============================================]].Visible=true;mainFrame.  
+    Size=UDim2.new(0,0,0,0);TweenService:Create(mainFrame,TweenInfo.new(0.3),{Size=UDim2.new(0,320,0, --[[====================================]]520)}):Play();end collapseBtn 
+    .MouseButton1Click:Connect(CollapseToIcon);miniIcon.MouseButton1Click:Connect(ExpandFromIcon);        --[[========================]]minimizeBtn.MouseButton1Click:Connect 
+    (function() isMinimized= not isMinimized;content.Visible= not isMinimized;mainFrame.Size=(isMinimized and UDim2.new(0,260,0,45)) or UDim2.new(0,320,0,520) ;minimizeBtn 
+  .Text=(isMinimized and "▶") or "▼" ;end);local function createToggle(name,def,y,cb) local f=Instance.new("Frame");f.Size=UDim2.new(1, -8,0,36);f.Position=UDim2.new(0,4 
+  ,0,y);f.BackgroundColor3=Color3.fromRGB(14,20,14);f.BackgroundTransparency=0.1;f.Parent=content;Instance.new("UICorner",f).CornerRadius=UDim.new(0,8);local l=        
+  Instance.new("TextLabel");l.Size=UDim2.new(0.6,0,1,0);l.BackgroundTransparency=1;l.Text=name;l.TextColor3=Color3.fromRGB(160,255,180);l.Font=Enum.Font.GothamSemibold;l 
+  .TextScaled=true;l.TextXAlignment=Enum.TextXAlignment.Left;l.Parent=f;local b=Instance.new("TextButton");b.Size=UDim2.new(0,55,0,26);b.Position=UDim2.new(1, -65,0.5, - 
+  13);b.BackgroundColor3=(def and Color3.fromRGB(40,200,80)) or Color3.fromRGB(180,40,40) ;b.Text=(def and "ON") or "OFF" ;b.TextColor3=Color3.new(1,1,1);b.Font=Enum.    
+  Font.GothamBold;b.TextScaled=true;b.Parent=f;Instance.new("UICorner",b).CornerRadius=UDim.new(0,6);local state=def;b.MouseButton1Click:Connect(function() state= not    
+  state;b.Text=(state and "ON") or "OFF" ;b.BackgroundColor3=(state and Color3.fromRGB(40,200,80)) or Color3.fromRGB(180,40,40) ;cb(state);end);end local y=6;            
+  createToggle("Главное ВКЛ",false,y,function(v) Settings.Enabled=v;end);y=y + 42 ;createToggle("Aimbot",false,y,function(v) Settings.Aimbot=v;end);y=y + 42 ;            
+  createToggle("Silent Aim",false,y,function(v) Settings.SilentAim=v;end);y=y + 42 ;createToggle("Triggerbot",false,y,function(v) Settings.AutoReaction=v;end);y=y + 42 ; 
+  createToggle("100% Hit",true,y,function(v) Settings.BulletTeleport=v;end);y=y + 42 ;createToggle("FOV Круг",true,y,function(v) Settings.ShowVisuals=v;end);y=y + 42 ;   
+  createToggle("ESP",true,y,function(v) Settings.ESP=v;end);y=y + 42 ;local hitboxToggleY=y;createToggle("Hitbox Expander",false,hitboxToggleY,function(v) Settings.      
+  ExpandHitbox=v;end);y=y + 42 ;local sizeFrame=Instance.new("Frame");sizeFrame.Size=UDim2.new(1, -16,0,40);sizeFrame.Position=UDim2.new(0,8,0,y);sizeFrame.                
+  BackgroundColor3=Color3.fromRGB(14,20,14);sizeFrame.BackgroundTransparency=0.1;sizeFrame.Parent=content;Instance.new("UICorner",sizeFrame).CornerRadius=UDim.new(0,8);    
+  local sizeLabel=Instance.new("TextLabel");sizeLabel.Size=UDim2.new(0.4,0,1,0);sizeLabel.BackgroundTransparency=1;sizeLabel.Text="Размер: "   .. Settings.HitboxSize ;     
+  sizeLabel.TextColor3=Color3.fromRGB(80,255,120);sizeLabel.Font=Enum.Font.GothamSemibold;sizeLabel.TextScaled=true;sizeLabel.Parent=sizeFrame;local minusBtn=Instance.new( 
+  "TextButton");minusBtn.Size=UDim2.new(0,40,0,28);minusBtn.Position=UDim2.new(0.55,0,0.5, -14);minusBtn.BackgroundColor3=Color3.fromRGB(30,50,30);minusBtn.Text="−";       
+  minusBtn.TextColor3=Color3.new(1,1,1);minusBtn.Font=Enum.Font.GothamBold;minusBtn.TextSize=18;minusBtn.Parent=sizeFrame;Instance.new("UICorner",minusBtn).CornerRadius=   
+  UDim.new(0,6);local plusBtn=Instance.new("TextButton");plusBtn.Size=UDim2.new(0,40,0,28);plusBtn.Position=UDim2.new(0.72,0,0.5, -14);plusBtn.BackgroundColor3=Color3.     
+  fromRGB(30,50,30);plusBtn.Text="+";plusBtn.TextColor3=Color3.new(1,1,1);plusBtn.Font=Enum.Font.GothamBold;plusBtn.TextSize=18;plusBtn.Parent=sizeFrame;Instance.new(      
+  "UICorner",plusBtn).CornerRadius=UDim.new(0,6);minusBtn.MouseButton1Click:Connect(function() Settings.HitboxSize=math.max(Settings.HitboxSize-1 ,3);sizeLabel.Text=       
+  "Размер: "   .. Settings.HitboxSize ;if (Settings.ExpandHitbox and currentTarget and currentTarget.Character) then local head=currentTarget.Character:FindFirstChild(     
+  "Head");if head then head.Size=Vector3.new(Settings.HitboxSize,Settings.HitboxSize,Settings.HitboxSize);end end end);plusBtn.MouseButton1Click:Connect(function()         
+  Settings.HitboxSize=math.min(Settings.HitboxSize + 1 ,20);sizeLabel.Text="Размер: "   .. Settings.HitboxSize ;if (Settings.ExpandHitbox and currentTarget and             
+  currentTarget.Character) then local head=currentTarget.Character:FindFirstChild("Head");if head then head.Size=Vector3.new(Settings.HitboxSize,Settings.HitboxSize,       
+  Settings.HitboxSize);end end end);y=y + 48 ;createToggle("Анти-Тим",true,y,function(v) Settings.AntiTeam=v;end);y=y + 42 ;createToggle("Wall Check",true,y,function(v)  
+  Settings.WallCheck=v;end);y=y + 42 ;content.CanvasSize=UDim2.new(0,0,0,y + 20 );local function updateESP() if  not Settings.ESP then for _,hl in pairs(visuals.esp) do  
+  hl:Destroy();end visuals.esp={};return;end for _,plr in ipairs(Players:GetPlayers()) do if ((plr==player) or  not plr.Character) then continue;end if (Settings.        
+    AntiTeam and (player.Team==plr.Team) and (player.Team~=nil)) then continue;end local character=plr.Character;local hum=character:FindFirstChildOfClass("Humanoid");if 
+     ( not hum or (hum.Health<=0)) then continue;end if  not visuals.esp[plr] then local highlight=Instance.new("Highlight");highlight.Adornee=character;highlight.       
+    FillTransparency=1;highlight.OutlineTransparency=0.15;highlight.OutlineColor=Color3.fromRGB(80,255,120);highlight.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop;      
+    highlight.Parent=character;visuals.esp[plr]=highlight;end end end local function updateSilentCircle() if  not Settings.ShowVisuals then if visuals.silentCircle then  
+      visuals.silentCircle:Destroy();visuals.silentCircle=nil;end return;end if  not visuals.silentCircle then visuals.silentCircle=Instance.new("Frame");visuals.      
+      silentCircle.BackgroundTransparency=0.85;visuals.silentCircle.BorderSizePixel=3;visuals.silentCircle.BorderColor3=Color3.fromRGB(80,255,120);visuals.silentCircle 
+      .Parent=screenGui;Instance.new("UICorner",visuals.silentCircle).CornerRadius=UDim.new(1,0);end visuals.silentCircle.Size=UDim2.new(0,Settings.FOV * 2 ,0,Settings 
+        .FOV * 2 );visuals.silentCircle.Position=UDim2.new(0.5, -Settings.FOV,0.5, -Settings.FOV);end local function ExpandHitbox(char,plr) if ( not char or (char==    
+        player.Character)) then return;end if (Settings.AntiTeam and (player.Team==plr.Team) and (player.Team~=nil)) then return;end local head=char:FindFirstChild(    
+        "Head");local headHB=char:FindFirstChild("HeadHB") or head ;if head then head.Size=Vector3.new(Settings.HitboxSize,Settings.HitboxSize,Settings.HitboxSize);    
+          head.Transparency=0.6;head.CanCollide=false;head.Massless=true;head.Shape=Enum.PartType.Ball;end if (headHB and (headHB~=head)) then headHB.Size=Vector3.   
+            new(Settings.HitboxSize,Settings.HitboxSize,Settings.HitboxSize);headHB.Transparency=0.6;headHB.CanCollide=false;headHB.Massless=true;headHB.Shape=Enum.  
+              PartType.Ball;end end local function RestoreHitbox(char) if  not char then return;end local head=char:FindFirstChild("Head");local headHB=char:         
+                FindFirstChild("HeadHB");if head then head.Size=Vector3.new(2,2,2);head.Transparency=0;head.CanCollide=true;head.Massless=false;head.Shape=Enum.      
+                  PartType.Block;end if headHB then headHB.Size=Vector3.new(2,2,2);headHB.Transparency=0;headHB.CanCollide=true;headHB.Massless=false;headHB.Shape= 
+                      Enum.PartType.Block;end end local function isWallCheck(targetChar) if  not Settings.WallCheck then return true;end local root=targetChar:     
+                                  FindFirstChild("HumanoidRootPart");if  not root then return false;end local params=RaycastParams.new();params.                    
+                                      FilterDescendantsInstances={player.Character};params.FilterType=Enum.RaycastFilterType.Exclude;local res=Workspace:Raycast(   
+                                      camera.CFrame.Position,root.Position-camera.CFrame.Position ,         params);return (res==nil) or res.Instance:              
+                                      IsDescendantOf(targetChar) ;end local function getBestAimPart         (character) local head=character:FindFirstChild(      
+                                      "Head");if head then return head;end return character:                FindFirstChild("UpperTorso") or character:            
+                                      FindFirstChild("HumanoidRootPart") ;end local function                applyAimbot(target) if ( not Settings.Aimbot or  not  
+                                      target) then return;end local part=getBestAimPart(target.               Character);if part then local targetCF=CFrame.      
+                                      lookAt(camera.CFrame.Position,part.Position);camera.CFrame=             camera.CFrame:Lerp(targetCF,Settings.AimSpeed);end  
+                                      end local function applySilentAim(target) if ( not Settings.            SilentAim or  not target) then return;end local   
+                                        part=getBestAimPart(target.Character);if part then local              targetCF=CFrame.lookAt(camera.CFrame.Position,    
+                                        part.Position);camera.CFrame=CFrame.lookAt(camera.CFrame.               Position,camera.CFrame.Position + (targetCF.    
+                                        LookVector * Settings.SilentStrength) );end end local                   function getBestTarget() local best,bestScore 
+                                        =nil, -math.huge;for _,plr in ipairs(Players:GetPlayers()               ) do if ((plr~=player) and plr.Character and  
+                                          not (Settings.AntiTeam and (player.Team==plr.Team)))                    then local hum=plr.Character:             
+                                        FindFirstChildOfClass("Humanoid");if (hum and (hum.Health                 >0)) then local head=plr.Character:       
+                                          FindFirstChild("Head");if (head and isWallCheck(plr.                      Character)) then local sp=camera:     
+                                          WorldToViewportPoint(head.Position);if (sp.Z>0) then                        local dist=(Vector2.new(sp.X,sp 
+                                            .Y) -(camera.ViewportSize/2)).Magnitude;if ((dist<                          bestScore) or (bestScore  
+                                            == -math.huge)) then bestScore=dist;best=plr;end                                  end end end 
+                                               end end return best;end RunService.          
+                                                RenderStepped:Connect(function() if  not  
+                                                    Settings.Enabled then return;end    
+                                                          currentTarget=          
+
+
+getBestTarget();if (currentTarget and currentTarget.Character) then updateSilentCircle();updateESP();if Settings.ExpandHitbox then ExpandHitbox(currentTarget.Character,currentTarget);end applyAimbot(currentTarget);applySilentAim(currentTarget);if Settings.AutoReaction then local headPos=camera:WorldToViewportPoint(currentTarget.Character.Head.Position);local center=camera.ViewportSize/2 ;if ((Vector2.new(headPos.X,headPos.Y) -center).Magnitude<(Settings.FOV * 0.75)) then print("🔫 Triggerbot → "   .. currentTarget.Name );end end end end);print("☣ Biohazard AI v5.4 загружен");print("• Стиль: Obsidian + Biohazard");print("• Цветовая схема: зелёный неон");print("• Свёртывание в иконку (⤢)");print("• Минимизация (▼)");
